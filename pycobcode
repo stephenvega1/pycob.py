@@ -15,19 +15,26 @@ translation_map = {
 
 # Function to translate Python code to COBOL
 def translate_to_cobol(python_code):
-    cobol_code = []
+    cobol_code = [
+        '       IDENTIFICATION DIVISION.',
+        '       PROGRAM-ID. SampleProgram.',
+        '       DATA DIVISION.',
+        '       WORKING-STORAGE SECTION.'
+    ]
     for line in python_code.split('\n'):
         # Handle variable assignments
         if '=' in line and '==' not in line:
             var, value = line.split('=')
             var = var.strip()
             value = value.strip().strip('"')
-            cobol_code.append(f'01 {var} PIC X({len(value)}).')
-            cobol_code.append(f'MOVE "{value}" TO {var}.')
+            cobol_code.append(f'       01 {var} PIC X({len(value)}).')
+            cobol_code.append(f'       MOVE "{value}" TO {var}.')
         else:
             for py_construct, cobol_construct in translation_map.items():
                 line = line.replace(py_construct, cobol_construct)
-            cobol_code.append(line)
+            cobol_code.append('       ' + line)
+    cobol_code.append('       PROCEDURE DIVISION.')
+    cobol_code.append('       STOP RUN.')
     return '\n'.join(cobol_code)
 
 # Function to compile and run COBOL code
